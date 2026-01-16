@@ -1,0 +1,15 @@
+{% extends 'inventory/base.html' %}
+{% block content %}
+
+<div class="card shadow p-4 text-center">
+    <h5 class="text-danger">Confirm Deletion</h5>
+    <p>Are you sure you want to delete <strong>{{ product.name }}</strong>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}

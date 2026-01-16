@@ -1,0 +1,55 @@
+{% extends 'inventory/base.html' %}
+{% block content %}
+
+<div class="row text-center mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 shadow">
+            <h6>Total Products</h6>
+            <h3>{{ total_products }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow">
+            <h6>Sales Today</h6>
+            <h3>{{ total_sales_today }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow">
+            <h6>Revenue Today</h6>
+            <h3>KES {{ total_revenue_today }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow">
+            <h6>Low Stock</h6>
+            <h3>{{ low_stock.count }}</h3>
+        </div>
+    </div>
+</div>
+
+<h5>Low Stock Items</h5>
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Stock</th>
+    </tr>
+    {% for item in low_stock %}
+    <tr>
+        <td>{{ item.name }}</td>
+        <td class="text-danger">{{ item.quantity }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No low stock items</td></tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'inventory:product_list' %}" class="btn btn-primary">
+    View Products
+</a>
+<div class="card text-white bg-success p-3 shadow">
+
+{% endblock %}

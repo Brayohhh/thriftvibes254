@@ -1,0 +1,12 @@
+{% extends 'inventory/base.html' %}
+{% block content %}
+
+<h4>Record Sale</h4>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-success">Record Sale</button>
+</form>
+
+{% endblock %}
