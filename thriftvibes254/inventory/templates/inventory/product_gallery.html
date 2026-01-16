@@ -1,0 +1,62 @@
+{% extends "inventory/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Page title -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Product Gallery</h4>
+        <a href="{% url 'inventory:product_create' %}" class="btn btn-dark">
+            + Add Product
+        </a>
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="row g-4">
+
+        {% for product in products %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 product-card">
+
+                <!-- Image -->
+                {% if product.image %}
+                    <img src="{{ product.image.url }}"
+                         class="card-img-top"
+                         style="height:220px; object-fit:cover;">
+                {% else %}
+                    <img src="{% static 'img/placeholder.png' %}"
+                         class="card-img-top"
+                         style="height:220px; object-fit:cover;">
+                {% endif %}
+
+                <!-- Body -->
+                <div class="card-body text-center">
+                    <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+                    <p class="text-muted small mb-2">{{ product.category }}</p>
+
+                    <span class="badge bg-dark fs-6">
+                        KES {{ product.price }}/=
+                    </span>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-white border-0 text-center">
+                    <a href="{% url 'inventory:product_update' product.id %}"
+                       class="btn btn-sm btn-outline-dark">
+                        Edit
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center text-muted">
+            No products added yet.
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}

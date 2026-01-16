@@ -5,6 +5,8 @@ from django.contrib import messages
 from .forms import ProductForm, SaleForm
 from django.db.models import Sum
 from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
+
 
 
 def product_list(request):
@@ -82,4 +84,18 @@ def dashboard(request):
         'low_stock': low_stock,
     }
 
-    return render(request, 'inventory/dashboard.html', context)
+    products = Product.objects.all()
+    return render(request, 'inventory/dashboard.html', {'products': products})
+
+def product_gallery(request):
+    products = Product.objects.all().order_by('-id')
+
+    context = {
+        'products': products
+    }
+    return render(request, 'inventory/product_gallery.html', context)
+@login_required
+def dashboard(request):
+    products = Product.objects.all()
+    return render(request, 'inventory/dashboard.html', {'products': products})
+
