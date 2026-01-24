@@ -1,0 +1,84 @@
+{% extends "inventory/base.html" %}
+{% block title %}New Order{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Order Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>🛒 New Order</h4>
+    <span class="badge bg-warning text-dark">
+      {{ order.status|title }}
+    </span>
+  </div>
+
+  <!-- Add Item Card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="mb-3">Add Item</h6>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-2">
+          {{ form.product.label_tag }}
+          {{ form.product }}
+        </div>
+
+        <div class="mb-2">
+          {{ form.quantity.label_tag }}
+          {{ form.quantity }}
+        </div>
+
+        {% if form.errors %}
+          <div class="alert alert-danger mt-2">
+            {{ form.errors }}
+          </div>
+        {% endif %}
+
+        <button class="btn btn-dark w-30 mt-2">
+          ➕ Add to Order
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Items -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h6 class="mb-3">Order Items</h6>
+
+      {% if items %}
+        <ul class="list-group mb-3">
+          {% for item in items %}
+            <li class="list-group-item d-flex justify-content-between">
+              <div>
+                <strong>{{ item.product.name }}</strong><br>
+                <small>Qty: {{ item.quantity }}</small>
+              </div>
+              <span>
+                KES {{ item.get_cost }}
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <div class="d-flex justify-content-between">
+          <strong>Total</strong>
+          <strong>KES {% widthratio order.get_total_price 1 1 %}</strong>
+        </div>
+
+        <a href="{% url 'inventory:checkout_order' order.id %}"
+           class="btn btn-success w-100 mt-3">
+            💰 Checkout
+         </a>
+
+
+      {% else %}
+        <p class="text-muted">No items added yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,12 +1,45 @@
 {% extends 'inventory/base.html' %}
+
 {% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
 
-<h4>Record Sale</h4>
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-dark text-white text-center rounded-top-4">
+                    <h4 class="mb-0">🛒 Record Sale</h4>
+                    <small class="text-muted">Add a new product sale</small>
+                </div>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-success">Record Sale</button>
-</form>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
 
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    {{ field.label }}
+                                </label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small">
+                                        {{ field.errors|striptags }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-success btn-lg rounded-pill">
+                                ✅ Record Sale
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}

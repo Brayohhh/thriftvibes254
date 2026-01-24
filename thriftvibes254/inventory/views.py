@@ -1,13 +1,32 @@
+from multiprocessing import context
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Product, Sale
+from .models import Product, Sale, Order,  OrderItem
 from decimal import Decimal
 from django.contrib import messages
-from .forms import ProductForm, SaleForm
+from .forms import ProductForm, SaleForm, OrderItemForm
 from django.db.models import Sum
 from django.utils.timezone import now
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.templatetags.static import static
+from.forms import CustomerSignupForm
 
 
+
+def signup(request):
+    if request.method == "POST":
+        form = CustomerSignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("inventory:dashboard")  
+    else:
+        form = CustomerSignupForm()
+
+    
+    return render(request, "registration/signup.html", {"form": form})   
 
 def product_list(request):
     products = Product.objects.all().order_by('-date_added')
@@ -48,13 +67,16 @@ def record_sale(request):
             sale = form.save(commit=False)
             product = sale.product
 
-            if sale.quantity_sold > product.quantity:
+            # ✅ FIXED FIELD NAME
+            if sale.quantity > product.quantity:
                 messages.error(request, 'Not enough stock available')
             else:
-                product.quantity -= sale.quantity_sold
+                # reduce stock
+                product.quantity -= sale.quantity
                 product.save()
 
-                sale.total_price = Decimal(sale.quantity_sold) * product.selling_price
+                # calculate total
+                sale.total_amount = Decimal(sale.quantity) * product.selling_price
                 sale.save()
 
                 messages.success(request, 'Sale recorded successfully')
@@ -63,7 +85,6 @@ def record_sale(request):
         form = SaleForm()
 
     return render(request, 'inventory/sale_form.html', {'form': form})
-
 def dashboard(request):
     total_products = Product.objects.count()
 
@@ -98,4 +119,87 @@ def product_gallery(request):
 def dashboard(request):
     products = Product.objects.all()
     return render(request, 'inventory/dashboard.html', {'products': products})
+
+def login_view(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('inventory:dashboard')
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'inventory/login.html', {'form': form})
+
+
+def service_worker(request):
+    sw_path = static("pwa/service-worker.js")
+    with open("." + sw_path, "r") as f:
+        return HttpResponse(f.read(), content_type="application/javascript")
+    
+@login_required
+def create_order(request):
+    order = Order.objects.create(customer=request.user)
+    return redirect('inventory:add_order_items', order_id=order.id)
+
+@login_required
+def add_order_items(request, order_id):
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
+    items = order.items.all()
+
+    if request.method == 'POST':
+        form = OrderItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.order = order
+
+            # 🔐 Stock protection
+            if item.quantity > item.product.quantity:
+                form.add_error('quantity', 'Not enough stock available')
+            else:
+                item.product.quantity -= item.quantity
+                item.product.save()
+                item.save()
+                return redirect('inventory:add_order_items', order_id=order.id)
+    else:
+        form = OrderItemForm()
+
+    context = {
+        'order': order,
+        'items': items,
+        'form': form
+    }
+    return render(request, 'inventory/orders/add_items.html', context)
+
+
+
+@login_required
+def checkout_order(request, order_id):
+    order = get_object_or_404(
+        Order,
+        id=order_id,
+        customer=request.user,
+        status='pending'
+    )
+
+    if not order.items.exists():
+        messages.error(request, "Your order has no items.")
+        return redirect('add_order_items', order_id=order.id)
+
+    if request.method == "POST":
+        order.status = 'confirmed'
+        order.save()
+        return redirect('order_confirmation', order_id=order.id)
+
+    return render(request, 'orders/checkout.html', {'order': order})
+
+@login_required
+def order_confirmation(request, order_id):
+    order = get_object_or_404(
+        Order,
+        id=order_id,
+        customer=request.user
+    )
+    return render(request, 'orders/confirmation.html', {'order': order})
 
