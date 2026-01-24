@@ -1,5 +1,4 @@
 env
-.env
 __pycache__/
 *.pyc
 .vscode/
@@ -10,3 +9,8 @@ dist/
 build/
 db.sqlite3
 *.log
+media/
+staticfiles/
+/static/
+.env
+pwa

@@ -203,3 +203,15 @@ def order_confirmation(request, order_id):
     )
     return render(request, 'orders/confirmation.html', {'order': order})
 
+@login_required
+def customer_dashboard(request):
+    return render(request, "customers/dashboard.html")
+
+
+
+
+def redirect_after_login(request):
+    if request.user.is_staff:
+        return redirect("inventory:dashboard")
+    else:
+        return redirect("inventory:customer_dashboard")

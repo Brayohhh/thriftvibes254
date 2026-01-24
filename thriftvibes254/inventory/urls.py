@@ -4,6 +4,7 @@ from.views import dashboard, order_confirmation, signup, checkout_order
 from . import views
 from .forms import CustomLoginForm
 from .views import create_order, add_order_items
+from .views import customer_dashboard, redirect_after_login
 
 
 app_name = 'inventory'
@@ -35,6 +36,8 @@ urlpatterns = [
     ),
     path('orders/<int:order_id>/checkout/', checkout_order, name='checkout_order'),
     path('orders/<int:order_id>/confirmation/', order_confirmation, name='order_confirmation'),
+    path("customer/dashboard/", customer_dashboard, name="customer_dashboard"),
+    path("redirect/", redirect_after_login, name="redirect_after_login"),
 ]
     
 
