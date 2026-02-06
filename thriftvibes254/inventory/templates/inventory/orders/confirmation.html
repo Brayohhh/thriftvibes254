@@ -13,7 +13,8 @@
         Status: <strong>{{ order.status|title }}</strong>
       </p>
 
-      <p>Total: <strong>KES {{ order.total_price }}</strong></p>
+      <p>Total: <strong>KES {{ order.get_total_amount }}</strong></p>
+
 
       <a href="/" class="btn btn-dark mt-3">
         Continue Shopping

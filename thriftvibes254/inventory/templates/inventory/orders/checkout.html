@@ -12,7 +12,7 @@
         {% for item in order.items.all %}
         <li class="list-group-item d-flex justify-content-between">
           <span>{{ item.product.name }} (x{{ item.quantity }})</span>
-          <strong>KES {{ item.subtotal }}</strong>
+          <strong>KES {{ item.total_price }}</strong>
         </li>
         {% endfor %}
       </ul>
@@ -23,6 +23,19 @@
       </div>
     </div>
   </div>
+<div>
+  <form method="post" action="{% url 'inventory:pay_with_mpesa' order.id %}">
+  {% csrf_token %}
+  <input type="text" name="phone" value="254" required>
+  <button type="submit" class="btn btn-success">
+    Pay with M-Pesa
+  </button>
+</form>
+</div>
+</div>
+<br>
+ 
+
 
   <form method="post">
     {% csrf_token %}
@@ -31,5 +44,5 @@
     </button>
   </form>
 
-</div>
+
 {% endblock %}

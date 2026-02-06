@@ -1,81 +1,108 @@
 {% extends "inventory/base.html" %}
-{% block title %}New Order{% endblock %}
+{% load static %}
+
+{% block title %}Add Items | ThriftVibes{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
 
-  <!-- Order Header -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>🛒 New Order</h4>
-    <span class="badge bg-warning text-dark">
-      {{ order.status|title }}
-    </span>
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">Add Items to Order</h3>
+      <small class="text-muted">Order #{{ order.id }}</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge 
+        {% if order.status == 'pending' %}bg-warning text-dark
+        {% elif order.status == 'paid' %}bg-success
+        {% else %}bg-secondary{% endif %}">
+        {{ order.status|title }}
+      </span>
+
+      <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-dark btn-sm">
+        <i class="bi bi-arrow-left"></i> Products
+      </a>
+    </div>
   </div>
 
-  <!-- Add Item Card -->
-  <div class="card shadow-sm mb-4">
+  <!-- Add Item -->
+  <div class="card shadow-sm mb-4 border-0">
     <div class="card-body">
-      <h6 class="mb-3">Add Item</h6>
+      <h6 class="fw-semibold mb-3">Add Item</h6>
 
-      <form method="post">
+      <form method="post" class="row g-3">
         {% csrf_token %}
 
-        <div class="mb-2">
+        <div class="col-md-6">
           {{ form.product.label_tag }}
           {{ form.product }}
         </div>
 
-        <div class="mb-2">
+        <div class="col-md-3">
           {{ form.quantity.label_tag }}
           {{ form.quantity }}
         </div>
 
+        <div class="col-md-3">
+          {{ form.price.label_tag }}
+          {{ form.price }}
+        </div>
+
         {% if form.errors %}
-          <div class="alert alert-danger mt-2">
-            {{ form.errors }}
+          <div class="col-12">
+            <div class="alert alert-danger mb-0">
+              {{ form.errors }}
+            </div>
           </div>
         {% endif %}
 
-        <button class="btn btn-dark w-30 mt-2">
-          ➕ Add to Order
-        </button>
+        <div class="col-12">
+          <button type="submit" class="btn btn-dark">
+            <i class="bi bi-plus-circle"></i> Add Item
+          </button>
+        </div>
       </form>
     </div>
   </div>
 
   <!-- Order Items -->
-  <div class="card shadow-sm">
+  <div class="card shadow-sm border-0">
     <div class="card-body">
-      <h6 class="mb-3">Order Items</h6>
+      <h6 class="fw-semibold mb-3">Order Items</h6>
 
       {% if items %}
-        <ul class="list-group mb-3">
+        <div class="list-group mb-3">
           {% for item in items %}
-            <li class="list-group-item d-flex justify-content-between">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
               <div>
-                <strong>{{ item.product.name }}</strong><br>
-                <small>Qty: {{ item.quantity }}</small>
+                <strong>{{ item.product }}</strong><br>
+                <small class="text-muted">
+                  Qty: {{ item.quantity }} × KES {{ item.price }}
+                </small>
               </div>
-              <span>
-                KES {{ item.get_cost }}
+              <span class="fw-semibold">
+                KES {{ item.subtotal }}
               </span>
-            </li>
+            </div>
           {% endfor %}
-        </ul>
-
-        <div class="d-flex justify-content-between">
-          <strong>Total</strong>
-          <strong>KES {% widthratio order.get_total_price 1 1 %}</strong>
         </div>
 
+        <!-- Total -->
+        <div class="d-flex justify-content-between border-top pt-3">
+          <strong>Total</strong>
+          <strong>KES {{ order.total_price }}</strong>
+        </div>
+
+        <!-- Checkout -->
         <a href="{% url 'inventory:checkout_order' order.id %}"
            class="btn btn-success w-100 mt-3">
-            💰 Checkout
-         </a>
-
+          💰 Proceed to Checkout
+        </a>
 
       {% else %}
-        <p class="text-muted">No items added yet.</p>
+        <p class="text-muted mb-0">No items added yet.</p>
       {% endif %}
     </div>
   </div>

@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 {% load static %}
+
+<form method="post">
+    {% csrf_token %}
+    ...
+</form>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">

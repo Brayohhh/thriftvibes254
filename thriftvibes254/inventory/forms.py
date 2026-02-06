@@ -59,15 +59,12 @@ class CustomLoginForm(AuthenticationForm):
 class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity']
+        fields = ["product", "quantity", "price"]
 
     def clean_quantity(self):
-        quantity = self.cleaned_data.get('quantity')
-        product = self.cleaned_data.get('product')
+        quantity = self.cleaned_data.get("quantity")
 
-        if product and quantity:
-            if quantity > product.quantity:   # ✅ FIX HERE
-                raise forms.ValidationError(
-                    f"Only {product.quantity} item(s) left in stock"
-                )
+        if quantity <= 0:
+            raise forms.ValidationError("Quantity must be greater than zero")
+
         return quantity
