@@ -24,7 +24,7 @@
     </div>
   </div>
 <div>
-  <form method="post" action="{% url 'inventory:pay_with_mpesa' order.id %}">
+  <form method="post" action="{% url 'inventory:pay_order' order.id %}">
   {% csrf_token %}
   <input type="text" name="phone" value="254" required>
   <button type="submit" class="btn btn-success">

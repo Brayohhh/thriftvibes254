@@ -113,6 +113,12 @@ class Payment(models.Model):
         null=True
     )
 
+    merchant_request_id= models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
@@ -123,7 +129,7 @@ class Payment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Payment {self.id} - {self.status}"
+        return self.phone_number
     
     class Meta:
         ordering = ['-created_at']

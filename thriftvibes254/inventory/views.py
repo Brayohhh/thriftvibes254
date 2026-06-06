@@ -200,100 +200,69 @@ def redirect_after_login(request):
 
 
 @login_required
-def pay_with_mpesa(request, order_id):
-    order = get_object_or_404(Order, id=order_id, customer=request.user)
+def pay_order(request, order_id):
 
-    # 🚫 Prevent double or invalid payments
-    if order.status != "pending":
-        return JsonResponse({"error": "Order cannot be paid"}, status=400)
+    if request.method == "POST":
 
-    total = order.total_price()
+        phone = request.POST['phone']
 
-    if total <= 0:
-        return JsonResponse({"error": "Order has no items"}, status=400)
+        order = Order.objects.get(id=order_id)
 
-    # ✅ MPESA requires integer amount
-    amount = int(total)
+        response = stk_push(
+            phone,
+            order.total_amount
+        )
 
-    phone = request.POST.get("phone")
+        Payment.objects.create(
+            order=order,
+            phone_number=phone,
+            amount=order.total_amount,
+            checkout_request_id=
+                response.get("CheckoutRequestID")
+        )
 
-    if not phone:
-        return JsonResponse({"error": "Phone number required"}, status=400)
-
-    # ---- MPESA STK PUSH PLACEHOLDER ----
-    # Replace this section with your real Mpesa STK function
-    # stk_push(phone, amount, order.id)
-
-    print("MPESA PAYMENT")
-    print("Order:", order.id)
-    print("Amount:", amount)
-    print("Phone:", phone)
-
-    return JsonResponse({
-        "message": "STK Push sent",
-        "order_id": order.id,
-        "amount": amount
-    })
-
+        return redirect('orders')
 
 @csrf_exempt
 def mpesa_callback(request):
-    """
-    Safaricom sends payment result here
-    """
-    data = json.loads(request.body)
 
-    stk_callback = data["Body"]["stkCallback"]
-    result_code = stk_callback["ResultCode"]
-    merchant_request_id = stk_callback["MerchantRequestID"]
-    checkout_request_id = stk_callback["CheckoutRequestID"]
-
-    # ❌ Payment failed or cancelled
-    if result_code != 0:
-        return JsonResponse({"message": "Payment failed"}, status=200)
-
-    # ✅ Payment successful
-    metadata = stk_callback["CallbackMetadata"]["Item"]
-
-    amount = None
-    receipt = None
-    phone = None
-    transaction_date = None
-
-    for item in metadata:
-        if item["Name"] == "Amount":
-            amount = item["Value"]
-        elif item["Name"] == "MpesaReceiptNumber":
-            receipt = item["Value"]
-        elif item["Name"] == "PhoneNumber":
-            phone = item["Value"]
-        elif item["Name"] == "TransactionDate":
-            transaction_date = item["Value"]
-
-    # 🔎 Find order using checkout_request_id
-    try:
-        order = Order.objects.get(
-            mpesa_transaction__checkout_request_id=checkout_request_id
-        )
-    except Order.DoesNotExist:
-        return JsonResponse({"error": "Order not found"}, status=404)
-
-    # ✅ Save transaction
-    MpesaTransaction.objects.update_or_create(
-        order=order,
-        defaults={
-            "checkout_request_id": checkout_request_id,
-            "merchant_request_id": merchant_request_id,
-            "amount": amount,
-            "phone": phone,
-            "mpesa_receipt_number": receipt,
-            "transaction_date": transaction_date,
-            "status": "SUCCESS"
-        }
+    data = json.loads(
+        request.body
     )
 
-    # ✅ Mark order as PAID
-    order.status = "paid"
-    order.save()
+    callback = data['Body'][
+        'stkCallback'
+    ]
 
-    return JsonResponse({"message": "Payment processed successfully"}, status=200)
+    checkout_id = callback[
+        'CheckoutRequestID'
+    ]
+
+    result_code = callback[
+        'ResultCode'
+    ]
+
+    payment = Payment.objects.get(
+        checkout_request_id=checkout_id
+    )
+
+    if result_code == 0:
+
+        payment.status = "PAID"
+
+        payment.save()
+
+        payment.order.payment_status = "PAID"
+
+        payment.order.save()
+
+    else:
+
+        payment.status = "FAILED"
+
+        payment.save()
+
+    return JsonResponse({
+        "ResultCode": 0,
+        "ResultDesc": "Accepted"
+    })

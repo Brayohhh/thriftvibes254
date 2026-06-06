@@ -26,6 +26,6 @@ urlpatterns = [
     path('orders/<int:order_id>/confirmation/', order_confirmation, name='order_confirmation'),
     path("customer/dashboard/", customer_dashboard, name="customer_dashboard"),
     path("redirect/", redirect_after_login, name="redirect_after_login"),
-    path("order/<int:order_id>/pay/", views.pay_with_mpesa, name="pay_with_mpesa"),
     path("mpesa/callback/", views.mpesa_callback, name="mpesa_callback"),
+    path("pay_order/<int:order_id>/", views.pay_order, name="pay_order"),
 ]
