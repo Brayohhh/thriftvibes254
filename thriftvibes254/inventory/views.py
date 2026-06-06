@@ -11,7 +11,7 @@ from django.utils.timezone import now
 from django.db.models import Sum
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Product, Sale, Order, OrderItem, MpesaTransaction
+from .models import Product, Sale, Order, OrderItem, MpesaTransaction, UserProfile
 from .forms import ProductForm, SaleForm, OrderItemForm, CustomerSignupForm
 from .mpesa import stk_push
 
@@ -266,3 +266,38 @@ def mpesa_callback(request):
         "ResultCode": 0,
         "ResultDesc": "Accepted"
     })
+
+@login_required
+def user_profile(request):
+    """Display user profile with details including email and signup date"""
+    user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    
+    context = {
+        'user': user,
+        'profile': profile,
+        'signup_date': user.date_joined,
+        'last_login': user.last_login,
+    }
+    return render(request, 'inventory/profile.html', context)
+
+@login_required
+def user_settings(request):
+    """Settings page for users to manage profile and upload profile picture"""
+    user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    
+    if request.method == "POST":
+        # Handle profile picture upload
+        if 'profile_pic' in request.FILES:
+            profile.profile_pic = request.FILES['profile_pic']
+            profile.save()
+            messages.success(request, 'Profile picture updated successfully')
+            return redirect('inventory:user_settings')
+    
+    context = {
+        'user': user,
+        'profile': profile,
+        'is_staff': user.is_staff,
+    }
+    return render(request, 'inventory/settings.html', context)

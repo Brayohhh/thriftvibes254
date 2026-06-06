@@ -1,0 +1,131 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}User Profile - ThriftVibes254{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <!-- Profile Card -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>User Profile</h5>
+        </div>
+        <div class="card-body">
+          <!-- Profile Picture Section -->
+          <div class="text-center mb-4">
+            {% if profile.profile_pic %}
+              <img src="{{ profile.profile_pic.url }}" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #007bff;">
+            {% else %}
+              <i class="bi bi-person-circle" style="font-size: 150px; color: #6c757d;"></i>
+            {% endif %}
+          </div>
+
+          <!-- User Details -->
+          <div class="mb-3">
+            <label class="form-label fw-bold text-muted">Username</label>
+            <p class="form-control-plaintext fs-5">{{ user.username }}</p>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold text-muted">First Name</label>
+              <p class="form-control-plaintext">{{ user.first_name|default:"Not provided" }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold text-muted">Last Name</label>
+              <p class="form-control-plaintext">{{ user.last_name|default:"Not provided" }}</p>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-muted">Email Address</label>
+            <p class="form-control-plaintext">{{ user.email|default:"Not provided" }}</p>
+          </div>
+
+          <hr>
+
+          <!-- Account Dates -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold text-muted">Account Created</label>
+              <p class="form-control-plaintext">
+                <i class="bi bi-calendar me-2"></i>
+                {{ signup_date|date:"M d, Y \a\t h:i A" }}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold text-muted">Last Login</label>
+              <p class="form-control-plaintext">
+                <i class="bi bi-clock-history me-2"></i>
+                {% if last_login %}
+                  {{ last_login|date:"M d, Y \a\t h:i A" }}
+                {% else %}
+                  This is your first login
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Account Status -->
+          <div class="mb-3">
+            <label class="form-label fw-bold text-muted">Account Type</label>
+            <p class="form-control-plaintext">
+              {% if user.is_staff %}
+                <span class="badge bg-danger"><i class="bi bi-shield-check me-1"></i>Administrator</span>
+              {% elif user.is_superuser %}
+                <span class="badge bg-danger"><i class="bi bi-shield-lock me-1"></i>Superuser</span>
+              {% else %}
+                <span class="badge bg-info"><i class="bi bi-person-check me-1"></i>Customer</span>
+              {% endif %}
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-4">
+            <a href="/admin/" class="btn btn-danger btn-sm">
+          Admin Panel
+        </a>
+            <a href="{% url 'inventory:user_settings' %}" class="btn btn-primary">
+              <i class="bi bi-pencil-square me-2"></i>Edit Profile
+            </a>
+            <a href="{% url 'inventory:dashboard' %}" class="btn btn-secondary">
+              <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats Sidebar -->
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Quick Info</h6>
+        </div>
+        <div class="card-body">
+          <p class="text-muted"><small>Email verified: <strong class="text-success">Yes</strong></small></p>
+          <p class="text-muted"><small>Two-factor auth: <strong class="text-warning">Not enabled</strong></small></p>
+          <p class="text-muted"><small>Account status: <strong class="text-success">Active</strong></small></p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Security</h6>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">Last password change:</p>
+          <p class="small"><em>{{ user.date_joined|date:"M d, Y" }}</em></p>
+          <a href="#" class="btn btn-sm btn-outline-warning w-100 mt-2">
+            <i class="bi bi-lock me-1"></i>Change Password
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

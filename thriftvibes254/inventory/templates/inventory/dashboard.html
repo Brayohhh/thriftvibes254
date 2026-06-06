@@ -62,7 +62,7 @@
                 <div class="card dash-card shadow-sm">
                     <div class="card-body">
                         <h6 class="fw-bold">
-                            <i class="bi bi-person me-1"></i> Profile
+                            <a href="{% url 'inventory:user_profile' %}" class="bi bi-person me-1">Profile Settings</a> 
                         </h6>
                         <p class="text-muted small">
                             Manage your personal information.
@@ -84,9 +84,7 @@
         <a href="{% url 'inventory:product_list' %}" class="btn btn-dark btn-sm">
           View Products
         </a>
-        <a href="/admin/" class="btn btn-danger btn-sm">
-          Admin Panel
-        </a>
+        
       </div>
     </div>
   </div>
@@ -100,7 +98,7 @@
         <ul class="list-group list-group-flush">
           {% for order in recent_orders %}
             <li class="list-group-item d-flex justify-content-between">
-              <span>#{{ order.id }}</span>
+              <span>#{{ order.order_id }}</span>
               <span class="badge bg-secondary">{{ order.status|title }}</span>
             </li>
           {% endfor %}

@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import dashboard, order_confirmation, signup, checkout_order, create_order, add_order_items, customer_dashboard, redirect_after_login
+from .views import dashboard, order_confirmation, signup, checkout_order, create_order, add_order_items, customer_dashboard, redirect_after_login, user_profile, user_settings
 from . import views
 from .forms import CustomLoginForm
 
@@ -28,4 +28,6 @@ urlpatterns = [
     path("redirect/", redirect_after_login, name="redirect_after_login"),
     path("mpesa/callback/", views.mpesa_callback, name="mpesa_callback"),
     path("pay_order/<int:order_id>/", views.pay_order, name="pay_order"),
+    path("profile/", user_profile, name="user_profile"),
+    path("settings/", user_settings, name="user_settings"),
 ]
