@@ -1,7 +1,15 @@
-{% extends 'inventory/base.html' %}
+{% extends 'customer_base.html' %}
 {% load static %}
 
 {% block title %}Settings - ThriftVibes254{% endblock %}
+
+{% block extra_css %}
+<style>
+  .card {
+    border-radius: 12px;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -15,11 +23,6 @@
         <a href="#picture-section" class="list-group-item list-group-item-action" data-bs-toggle="list">
           <i class="bi bi-image me-2"></i>Profile Picture
         </a>
-        {% if is_staff %}
-        <a href="#admin-section" class="list-group-item list-group-item-action" data-bs-toggle="list">
-          <i class="bi bi-shield-check me-2"></i>Admin Panel
-        </a>
-        {% endif %}
         <a href="#security-section" class="list-group-item list-group-item-action" data-bs-toggle="list">
           <i class="bi bi-lock me-2"></i>Security
         </a>
@@ -110,60 +113,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Admin Panel Section (Only for staff) -->
-      {% if is_staff %}
-      <div class="card shadow-sm mb-4 border-danger" id="admin-section">
-        <div class="card-header bg-danger text-white">
-          <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Admin Panel</h5>
-        </div>
-        <div class="card-body">
-          <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            <strong>Administrator Access:</strong> You have administrative privileges for this platform.
-          </div>
-
-          <h6 class="mb-3">Quick Admin Actions</h6>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-danger w-100">
-                <i class="bi bi-box-seam me-2"></i>Manage Products
-              </a>
-            </div>
-            <div class="col-md-6 mb-3">
-              <a href="{% url 'inventory:record_sale' %}" class="btn btn-outline-danger w-100">
-                <i class="bi bi-graph-up me-2"></i>Record Sales
-              </a>
-            </div>
-          </div>
-
-          <hr>
-
-          <h6 class="mb-3">Customer Management</h6>
-          <div class="table-responsive">
-            <table class="table table-sm table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colspan="4" class="text-center text-muted py-3">
-                    <small>No additional customers to display in quick view</small>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <small class="text-muted">For full customer management, access the admin dashboard from the main menu.</small>
-        </div>
-      </div>
-      {% endif %}
 
       <!-- Security Section -->
       <div class="card shadow-sm" id="security-section">

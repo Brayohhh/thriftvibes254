@@ -1,7 +1,15 @@
-{% extends 'inventory/base.html' %}
+{% extends 'customer_base.html' %}
 {% load static %}
 
 {% block title %}User Profile - ThriftVibes254{% endblock %}
+
+{% block extra_css %}
+<style>
+  .card {
+    border-radius: 12px;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -86,13 +94,10 @@
 
           <!-- Action Buttons -->
           <div class="mt-4">
-            <a href="/admin/" class="btn btn-danger btn-sm">
-          Admin Panel
-        </a>
             <a href="{% url 'inventory:user_settings' %}" class="btn btn-primary">
               <i class="bi bi-pencil-square me-2"></i>Edit Profile
             </a>
-            <a href="{% url 'inventory:dashboard' %}" class="btn btn-secondary">
+            <a href="{% url 'inventory:customer_dashboard' %}" class="btn btn-secondary">
               <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
             </a>
           </div>
